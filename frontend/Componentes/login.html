@@ -1,0 +1,28 @@
+<section class="contenedor">
+  <h1>Iniciar Sesión</h1>
+  <div class="auth-form">
+    <input type="email" id="loginEmail" placeholder="Email" onkeypress="if(event.key==='Enter') login()"/>
+    <input type="password" id="loginPassword" placeholder="Contraseña" onkeypress="if(event.key==='Enter') login()"/>
+    <div class="auth-buttons">
+      <button onclick="login()" class="btn-primary">Iniciar Sesión</button>
+    </div>
+  </div>
+</section>
+
+<script>
+  async function login() {
+    let email = obtener("loginEmail").value.trim();
+    let pass = obtener("loginPassword").value.trim();
+    
+    if (!email || !pass) return mensaje("Completa los campos", "error");
+    
+    try {
+      let res = await servidor("/login", "POST", { email: email, password: pass });
+      usuario = res.usuario;
+      guardarSesion("usuario", usuario);
+      mensaje("Bienvenido " + usuario.usuario, "exito");
+    } catch(e) {
+      mensaje("Email o contraseña incorrectos", "error");
+    }
+  }
+</script>

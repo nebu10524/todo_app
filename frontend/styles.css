@@ -1,56 +1,72 @@
-/* ========== ESTILOS GENERALES ========== */
-* { 
-  margin: 0; 
-  padding: 0; 
-  box-sizing: border-box; 
+/* Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
+/* Body */
 body {
-  font-family: "Poppins", sans-serif;
-  min-height: 100vh;
-  background: linear-gradient(135deg, #667eea, #764ba2);
-  display: flex; 
-  justify-content: center; 
-  align-items: center;
+  font-family: Arial, sans-serif;
+  background: #f0f0f0;
   padding: 20px;
 }
 
-/* ========== CONTENEDOR PRINCIPAL ========== */
+/* Contenedor */
 .contenedor {
+  max-width: 600px;
+  margin: 0 auto;
+  background: white;
+  padding: 30px;
+  border: 1px solid #ccc;
+}
+
+h1 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+/* Inputs, Selects y Botones */
+input, select {
   width: 100%;
-  max-width: 650px;
-  background: rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(15px);
-  padding: 30px; 
-  border-radius: 16px;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+  padding: 10px;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+}
+
+button {
+  padding: 10px 20px;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
   color: white;
-  animation: fadeIn 1s ease-in-out;
 }
 
-h1 { 
-  text-align: center; 
-  margin-bottom: 20px; 
-  font-weight: 600; 
+button:hover {
+  opacity: 0.8;
 }
 
-/* ========== FORMULARIOS DE AUTENTICACIÓN ========== */
-.auth-form {
+/* Colores de Botones */
+.btn-primary, #btnLogin, #btnAgregar { background: #007bff; }
+.btn-success, #btnRegistro { background: #28a745; }
+.btn-secondary, #volverLogin, #volverTareas { background: #6c757d; }
+.btn-danger, #btnEliminarTodas { background: #dc3545; }
+#btnExportar { background: #ffc107; color: #000; }
+.alternar { background: #28a745; }
+.edit { background: #ffc107; color: #000; }
+.eliminar { background: #dc3545; }
+#btnLogout { background: #dc3545; padding: 8px 15px; }
+
+/* Formularios */
+.auth-form, .task-form, .action-buttons {
   display: flex;
   flex-direction: column;
-  gap: 15px;
-  margin-top: 20px;
+  gap: 10px;
 }
 
-.auth-form input {
-  width: 100%;
-  padding: 12px;
-  border: none;
-  border-radius: 8px;
-  outline: none;
-  font-size: 15px;
-  background: rgba(255, 255, 255, 0.9);
-}
+.task-form { margin-bottom: 20px; }
+.action-buttons { margin-top: 20px; }
 
 .auth-buttons {
   display: flex;
@@ -59,487 +75,149 @@ h1 {
   margin-top: 10px;
 }
 
-.auth-buttons button {
+.auth-buttons button, .action-buttons button {
   width: 100%;
-  padding: 12px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 15px;
-  font-weight: bold;
-  transition: all 0.3s ease;
 }
 
-/* ========== BOTONES ========== */
-.btn-primary {
-  background: #00c6ff;
-  color: white;
+.info-actual {
+  background: #f8f9fa;
+  padding: 15px;
+  border: 1px solid #ddd;
+  margin-bottom: 15px;
 }
 
-.btn-primary:hover {
-  background: #0096c7;
-  transform: scale(1.05);
-}
-
-.btn-success {
-  background: #28a745;
-  color: white;
-}
-
-.btn-success:hover {
-  background: #1e7e34;
-  transform: scale(1.05);
-}
-
-.btn-secondary {
-  background: rgba(255, 255, 255, 0.2);
-  color: white;
+.info-actual p {
+  margin: 5px 0;
   font-size: 14px;
-  padding: 10px;
 }
 
-.btn-secondary:hover {
-  background: rgba(255, 255, 255, 0.3);
-  transform: scale(1.02);
-}
-
-.btn-danger {
-  width: 100%;
-  padding: 12px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 15px;
-  font-weight: bold;
-  transition: all 0.3s ease;
-  background: #dc3545;
-  color: white;
-}
-
-.btn-danger:hover {
-  background: #a71d2a;
-  transform: scale(1.05);
-}
-
-/* ========== ENLACES Y TEXTO ========== */
+/* Links */
 .text-center {
   text-align: center;
   margin-top: 15px;
-  font-size: 14px;
 }
 
 .text-center a {
-  color: #00c6ff;
+  color: #007bff;
   cursor: pointer;
   text-decoration: underline;
-  font-weight: bold;
 }
 
-.text-center a:hover {
-  color: #0096c7;
+/* Lista Tareas y Usuarios */
+ul {
+  list-style: none;
+  padding: 0;
 }
 
-/* ========== HEADER DE USUARIO ========== */
-.user-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-  padding: 10px;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 8px;
+#listaUsuarios li {
+  display: block;
+  padding: 15px;
+  margin-bottom: 10px;
+  border: 1px solid #ddd;
+  background: #f9f9f9;
 }
 
-.user-info {
-  font-size: 14px;
+#listaUsuarios li strong {
+  font-size: 16px;
+  color: #333;
 }
 
-.user-actions {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-}
-
-#btnConfiguracion {
-  background: rgba(255, 255, 255, 0.2);
-  color: white;
-  padding: 8px 12px;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 18px;
-  transition: all 0.3s ease;
-}
-
-#btnConfiguracion:hover {
-  background: rgba(255, 255, 255, 0.3);
-  transform: scale(1.1);
-}
-
-#btnLogout {
-  background: #ff4b5c;
-  color: white;
-  padding: 8px 16px;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
+#listaUsuarios li small {
+  display: block;
+  margin-top: 5px;
+  color: #666;
   font-size: 13px;
-  font-weight: bold;
-  transition: all 0.3s ease;
-}
-
-#btnLogout:hover {
-  background: #c82333;
-  transform: scale(1.05);
-}
-
-/* ========== INPUTS Y SELECTS ========== */
-input, select {
-  padding: 10px;
-  border: none;
-  border-radius: 8px;
-  outline: none;
-  font-size: 15px;
-  margin-right: 8px;
-}
-
-input[type="text"] { width: 45%; }
-input[type="date"] { width: 25%; }
-
-/* ========== BOTONES GENERALES ========== */
-button {
-  padding: 10px 18px; 
-  border: none; 
-  border-radius: 8px;
-  cursor: pointer; 
-  font-size: 14px;
-  transition: all 0.3s ease;
-}
-
-#btnAgregar { 
-  background: #00c6ff; 
-  color: white; 
-  font-weight: bold; 
-}
-
-#btnAgregar:hover { 
-  background: #0096c7; 
-  transform: scale(1.05); 
-}
-
-#btnEliminarTodas, #btnExportar {
-  margin-top: 15px; 
-  width: 100%;
-  color: white; 
-  font-weight: bold;
-}
-
-#btnEliminarTodas {
-  background: #ff4b5c;
-}
-
-#btnEliminarTodas:hover { 
-  background: #c82333; 
-  transform: scale(1.05); 
-}
-
-#btnExportar {
-  background: #ffc107;
-  color: #000;
-}
-
-#btnExportar:hover {
-  background: #e0a800;
-  transform: scale(1.05);
-}
-
-/* ========== LISTA DE TAREAS ========== */
-ul { 
-  list-style: none; 
-  margin-top: 20px; 
-  padding: 0; 
 }
 
 li {
-  background: rgba(255, 255, 255, 0.2);
-  padding: 12px; 
-  border-radius: 10px;
-  margin-bottom: 10px; 
-  display: flex; 
-  justify-content: space-between; 
+  display: flex;
+  justify-content: space-between;
   align-items: center;
-  animation: slideIn 0.4s ease;
+  padding: 15px;
+  margin-bottom: 10px;
+  border: 1px solid #ddd;
+  background: #f9f9f9;
+}
+
+li.completada {
+  background: #e9ecef;
+}
+
+li.completada .task-text {
+  text-decoration: line-through;
+  color: #6c757d;
 }
 
 .informacion {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 5px;
+  flex: 1;
+}
+
+.task-text {
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.informacion small {
+  font-size: 12px;
+  color: #666;
 }
 
 .task-buttons {
   display: flex;
-  gap: 6px;
+  gap: 5px;
 }
 
-li.completada .task-text { 
-  text-decoration: line-through; 
-  color: #ddd; 
+.task-buttons button {
+  padding: 8px 12px;
+  font-size: 12px;
 }
 
-.informacion small { 
-  font-size: 13px; 
-  color: #f0f0f0;
-  margin-left: 2px;
-}
-
-.expired { color: #ffcccc; }
-.near { color: #ffeb99; }
-
-/* ========== BOTONES DE TAREA ========== */
-button.eliminar { 
-  background: #ff4b5c; 
-  color: white; 
-  padding: 6px 12px; 
-}
-
-button.eliminar:hover { 
-  background: #c82333; 
-}
-
-button.alternar { 
-  background: #28a745; 
-  color: white; 
-  padding: 6px 12px; 
-}
-
-button.alternar:hover { 
-  background: #1e7e34; 
-}
-
-button.edit { 
-  background: #ffc107; 
-  color: black; 
-  padding: 6px 12px; 
-}
-
-button.edit:hover { 
-  background: #e0a800; 
-}
-
-/* ========== MENSAJES ========== */
+/* Mensajes */
 .mensaje {
-  position: fixed; 
-  top: 10%; 
-  left: 50%; 
-  transform: translateX(-50%);
-  padding: 15px 30px; 
-  border-radius: 10px;
-  font-weight: bold; 
-  font-size: 18px; 
-  opacity: 0.95;
-  z-index: 1000; 
-  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-  animation: fadeinout 3s forwards;
-}
-
-.exito { background-color: #28a745; color: white; }
-.error { background-color: #dc3545; color: white; }
-.advertencia { background-color: #ffc107; color: #000; }
-
-/* ========== MODALES ========== */
-.modal {
   position: fixed;
-  z-index: 2000;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.7);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  animation: fadeIn 0.3s ease;
-}
-
-.modal-content {
-  background: linear-gradient(135deg, #667eea, #764ba2);
-  padding: 0;
-  border-radius: 16px;
-  width: 90%;
-  max-width: 500px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-  animation: slideIn 0.4s ease;
-  max-height: 90vh;
-  overflow-y: auto;
-}
-
-.modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 20px 30px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 16px 16px 0 0;
-}
-
-.modal-header h2 {
-  margin: 0;
-  color: white;
-  font-size: 24px;
-}
-
-.close-modal {
-  color: white;
-  font-size: 32px;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 15px 30px;
   font-weight: bold;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  line-height: 1;
+  z-index: 99999;
+  border: 1px solid;
+  border-radius: 5px;
 }
 
-.close-modal:hover {
-  color: #ff4b5c;
-  transform: rotate(90deg);
+.exito {
+  background: #d4edda;
+  color: #155724;
+  border-color: #c3e6cb;
 }
 
-.modal-body {
-  padding: 30px;
-  color: white;
+.error {
+  background: #f8d7da;
+  color: #721c24;
+  border-color: #f5c6cb;
 }
 
-/* ========== SECCIONES DE CONFIGURACIÓN ========== */
-.config-section {
-  background: rgba(255, 255, 255, 0.1);
-  padding: 20px;
-  border-radius: 12px;
-  backdrop-filter: blur(10px);
+.advertencia {
+  background: #fff3cd;
+  color: #856404;
+  border-color: #ffeaa7;
 }
 
-.config-section h3 {
-  margin: 0 0 15px 0;
-  font-size: 18px;
-  color: white;
-}
-
-/* ========== TARJETAS DE USUARIO ========== */
-.user-card {
-  background: rgba(255, 255, 255, 0.15);
-  padding: 15px;
-  border-radius: 10px;
-  margin-bottom: 12px;
-  display: flex;
-  align-items: center;
-  gap: 15px;
-  transition: all 0.3s ease;
-  border: 2px solid transparent;
-}
-
-.user-card:hover {
-  background: rgba(255, 255, 255, 0.25);
-  border-color: rgba(255, 255, 255, 0.3);
-  transform: translateX(5px);
-}
-
-.user-avatar {
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #00c6ff, #0072ff);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 24px;
-  font-weight: bold;
-  color: white;
-  flex-shrink: 0;
-}
-
-.user-details {
-  flex: 1;
-}
-
-.user-details h4 {
-  margin: 0 0 5px 0;
-  font-size: 16px;
-  color: white;
-}
-
-.user-details p {
-  margin: 0;
-  font-size: 13px;
-  color: #e0e0e0;
-}
-
-.user-badge {
-  background: rgba(0, 198, 255, 0.3);
-  padding: 4px 10px;
-  border-radius: 12px;
-  font-size: 11px;
-  font-weight: bold;
-  color: #00c6ff;
-}
-
-.no-users {
-  text-align: center;
-  padding: 40px 20px;
-  color: #ddd;
-}
-
-.no-users-icon {
-  font-size: 60px;
-  margin-bottom: 15px;
-}
-
-/* ========== GRUPOS DE FORMULARIOS ========== */
-.form-group {
-  margin-bottom: 15px;
-}
-
-.form-group label {
-  color: white;
-  display: block;
-  margin-bottom: 5px;
-  font-size: 14px;
-}
-
-.form-group input,
-.form-group select {
-  width: 100%;
-  padding: 12px;
-  border: none;
-  border-radius: 8px;
-  font-size: 15px;
-  margin-right: 0;
-}
-
-.button-group {
-  display: flex;
-  gap: 10px;
-  margin-top: 10px;
-}
-
-.button-group button {
-  flex: 1;
-  padding: 12px;
-  font-size: 15px;
-  font-weight: bold;
-}
-
-/* ========== ANIMACIONES ========== */
-@keyframes fadeinout {
-  0% { opacity: 0; transform: translate(-50%, -20px); }
-  10%, 90% { opacity: 1; transform: translate(-50%, 0); }
-  100% { opacity: 0; transform: translate(-50%, -20px); }
-}
-
-@keyframes slideIn {
-  from { transform: translateX(-50px); opacity: 0; }
-  to { transform: translateX(0); opacity: 1; }
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: scale(0.95); }
-  to { opacity: 1; transform: scale(1); }
+/* Responsive */
+@media (max-width: 768px) {
+  .contenedor {
+    padding: 20px;
+  }
+  
+  .task-buttons {
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  .task-buttons button {
+    width: 100%;
+  }
 }

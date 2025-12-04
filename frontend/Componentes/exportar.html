@@ -1,0 +1,31 @@
+<div class="contenedor">
+  <h1>Exportar Tareas</h1>
+  
+  <div class="info-actual">
+    <p style="text-align:center;">Descarga todas tus tareas en formato JSON</p>
+  </div>
+  
+  <div class="action-buttons">
+    <button onclick="exportar()" style="background:#ffc107; color:#000;">Exportar tareas</button>
+  </div>
+</div>
+
+<script>
+  async function exportar() {
+    try {
+      let res = await servidor("/tareas/usuario/" + usuario.id_usuario, "GET");
+      if (!res.tareas || res.tareas.length === 0) return mensaje("No hay tareas", "advertencia");
+      
+      let blob = new Blob([JSON.stringify(res.tareas, null, 2)], { type: "application/json" });//convierte tarea en texto json y blob crea archivo 
+      let url = URL.createObjectURL(blob);
+      let a = crear("a");
+      a.href = url;//le dice al enlace que apunte al archivo creado
+      a.download = "tareas_" + usuario.usuario + ".json";//le pone nombre
+      a.click();//click automatico
+      setTimeout(function() { URL.revokeObjectURL(url); }, 1000);//ejecuta y elimina
+      mensaje("Exportadas", "exito");
+    } catch(e) {
+      mensaje("Error", "error");
+    }
+  }
+</script>

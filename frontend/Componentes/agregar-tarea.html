@@ -1,0 +1,42 @@
+<div class="contenedor">
+  <h1>Agregar Tarea</h1>
+  
+  <div class="task-form">
+    <input type="text" id="entradaTarea" placeholder="Escribe una tarea..." onkeypress="if(event.key==='Enter') agregarTarea()"/>
+    <input type="date" id="fechaLimite"/>
+    <select id="prioridadTarea">
+      <option value="alta">Alta</option>
+      <option value="media" selected>Media</option>
+      <option value="baja">Baja</option>
+    </select>
+    <button onclick="agregarTarea()" style="background:#28a745; color:white;">Añadir</button>
+  </div>
+</div>
+
+<script>
+  async function agregarTarea() {
+    let texto = obtener("entradaTarea").value.trim();
+    let fecha = obtener("fechaLimite").value;
+    let prioridad = obtener("prioridadTarea").value;
+    
+    if (!texto) return mensaje("Escribe una tarea", "error");
+    if (texto.length < 3) return mensaje("Mínimo 3 caracteres", "error");
+    
+    try {
+      await servidor("/tareas", "POST", {
+        texto: texto,
+        fecha: fecha || null,
+        prioridad: prioridad,
+        completada: false,
+        usuario_id: usuario.id_usuario
+      });
+      
+      obtener("entradaTarea").value = "";
+      obtener("fechaLimite").value = "";
+      obtener("prioridadTarea").value = "media";
+      mensaje("Tarea añadida", "exito");
+    } catch(e) {
+      mensaje("Error al guardar", "error");
+    }
+  }
+</script>

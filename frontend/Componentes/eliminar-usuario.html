@@ -1,0 +1,31 @@
+<section class="contenedor">
+  <h1>Eliminar Mi Cuenta</h1>
+
+  <div class="info-actual">
+    <p style="text-align:center; color:#dc3545; font-weight:bold;">⚠️ ADVERTENCIA: Esta acción eliminará tu cuenta permanentemente</p>
+    <p style="text-align:center;">Se eliminarán también TODAS tus tareas</p>
+    <p style="text-align:center;">Esta acción NO se puede deshacer</p>
+  </div>
+
+  <div class="auth-buttons">
+    <button onclick="eliminarCuenta()" class="btn-danger">Eliminar Mi Cuenta</button>
+  </div>
+</section>
+
+<script>
+  async function eliminarCuenta() {
+    if (!confirm("¿ELIMINAR TU CUENTA? Esta acción no se puede deshacer.")) return;
+    if (!confirm("¿Estás completamente seguro?")) return;
+    
+    try {
+      await servidor("/tareas/usuario/" + usuario.id_usuario, "DELETE");
+      await servidor("/usuarios/" + usuario.id_usuario, "DELETE");
+      mensaje("Cuenta eliminada", "exito");
+      
+      usuario = null;
+      borrarSesion("usuario");
+    } catch(e) {
+      mensaje("Error al eliminar cuenta", "error");
+    }
+  }
+</script>

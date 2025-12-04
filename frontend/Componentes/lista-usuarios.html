@@ -1,0 +1,39 @@
+<section class="contenedor">
+  <h1>Usuarios Registrados</h1>
+  
+  <div class="info-actual">
+    <p style="text-align:center; color:#666;">Lista de todos los usuarios registrados</p>
+  </div>
+  
+  <ul id="listaUsuarios"></ul>
+</section>
+
+<script>
+  async function cargarUsuarios() {
+    try {
+      let res = await servidor("/usuarios", "GET");
+      let lista = obtener("listaUsuarios");
+      lista.innerHTML = "";
+      
+      if (!res.usuarios || res.usuarios.length === 0) {
+        let li = crear("li");
+        li.textContent = "No hay usuarios registrados";
+        agregar(lista, li);
+        return;
+      }
+      
+      for (let i = 0; i < res.usuarios.length; i++) {
+        let u = res.usuarios[i];
+        let li = crear("li");
+        let nombre = crear("strong");
+        nombre.textContent = u.usuario;
+        agregar(li, nombre);
+        agregar(lista, li);
+      }
+    } catch(e) {
+      mensaje("Error al cargar usuarios", "error");
+    }
+  }
+  
+  cargarUsuarios();
+</script>
