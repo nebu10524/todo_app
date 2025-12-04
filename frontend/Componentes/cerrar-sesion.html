@@ -1,0 +1,20 @@
+<section class="contenedor">
+  <h1>Cerrar Sesión</h1>
+
+  <div class="info-actual">
+    <p style="text-align:center; color:#dc3545; font-weight:bold;">¿Estás seguro que deseas cerrar sesión?</p>
+  </div>
+
+  <div class="auth-buttons">
+    <button onclick="salir()" class="btn-danger">Cerrar Sesión</button>
+  </div>
+</section>
+
+<script>
+  function salir() {
+    if (!confirm("¿Cerrar sesión?")) return;
+    usuario = null;
+    borrarSesion("usuario");
+    mensaje("Sesión cerrada", "exito");
+  }
+</script>

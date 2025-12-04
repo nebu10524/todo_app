@@ -1,0 +1,35 @@
+<section class="contenedor">
+  <h1>Crear Cuenta Nueva</h1>
+  <div class="auth-form">
+    <input type="text" id="registroUsuario" placeholder="Nombre de Usuario"/>
+    <input type="email" id="registroEmail" placeholder="Email"/>
+    <input type="password" id="registroPassword" placeholder="Contraseña" onkeypress="if(event.key==='Enter') registrar()"/>
+    <div class="auth-buttons">
+      <button onclick="registrar()" class="btn-success">Registrarse</button>
+    </div>
+  </div>
+</section>
+
+<script>
+  async function registrar() {
+    let user = obtener("registroUsuario").value.trim();
+    let email = obtener("registroEmail").value.trim();
+    let pass = obtener("registroPassword").value.trim();
+    
+    if (!user || !email || !pass) return mensaje("Completa los campos", "error");
+    if (user.length < 3) return mensaje("Usuario: mínimo 3 caracteres", "error");
+    if (pass.length < 6) return mensaje("Contraseña: mínimo 6 caracteres", "error");
+    
+    try {
+      await servidor("/usuarios", "POST", { usuario: user, email: email, password: pass });
+      mensaje("Usuario registrado exitosamente", "exito");
+      
+      // Limpiar formulario después de registrar
+      obtener("registroUsuario").value = "";
+      obtener("registroEmail").value = "";
+      obtener("registroPassword").value = "";
+    } catch(e) {
+      mensaje("Error al registrar", "error");
+    }
+  }
+</script>

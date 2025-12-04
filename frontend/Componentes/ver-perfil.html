@@ -1,0 +1,15 @@
+<div class="contenedor">
+  <h1>Mi Perfil</h1>
+
+  <div class="info-actual">
+    <p><strong>ID:</strong> <span id="perfilId"></span></p>
+    <p><strong>Usuario:</strong> <span id="perfilUsuario"></span></p>
+    <p><strong>Email:</strong> <span id="perfilEmail"></span></p>
+  </div>
+</div>
+
+<script>
+  obtener("perfilId").textContent = usuario.id_usuario;
+  obtener("perfilUsuario").textContent = usuario.usuario;
+  obtener("perfilEmail").textContent = usuario.email;
+</script>

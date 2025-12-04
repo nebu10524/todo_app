@@ -1,0 +1,108 @@
+<section class="contenedor">
+  <h1>Editar Tarea</h1>
+  
+  <div class="info-actual">
+    <p>Selecciona una tarea para editar</p>
+  </div>
+  
+  <ul id="listaTareasEditar"></ul>
+  
+  <div id="formularioEditar" style="display:none; margin-top:20px;">
+    <h3>Editando tarea:</h3>
+    <div class="auth-form">
+      <input type="text" id="editarTextoTarea" placeholder="Texto de la tarea"/>
+      <input type="date" id="editarFechaTarea"/>
+      <select id="editarPrioridadTarea">
+        <option value="alta">Alta</option>
+        <option value="media">Media</option>
+        <option value="baja">Baja</option>
+      </select>
+      <button onclick="guardarTarea()">Guardar Cambios</button>
+    </div>
+  </div>
+</section>
+
+<script>
+  async function cargarTareasEditar() {
+    try {
+      let res = await servidor("/tareas/usuario/" + usuario.id_usuario, "GET");
+      let lista = obtener("listaTareasEditar");
+      lista.innerHTML = "";
+      
+      if (!res.tareas || res.tareas.length === 0) {
+        return;
+      }
+      
+      for (let i = 0; i < res.tareas.length; i++) {
+        let t = res.tareas[i];
+        let li = crear("li");
+        
+        let info = crear("div");
+        info.className = "informacion";
+        
+        let texto = crear("span");
+        texto.textContent = t.texto;
+        texto.className = "task-text";
+        agregar(info, texto);
+        
+        let fecha = crear("small");
+        fecha.textContent = "Fecha: " + (t.fecha || "Sin fecha");
+        agregar(info, fecha);
+        
+        let prioridad = crear("small");
+        prioridad.textContent = "Prioridad: " + t.prioridad;
+        agregar(info, prioridad);
+        
+        let btns = crear("div");
+        btns.className = "task-buttons";
+        
+        let btnEdit = crear("button");
+        btnEdit.className = "edit";
+        btnEdit.textContent = "Editar";
+        btnEdit.onclick = function() {
+          seleccionarTarea(t);
+        };
+        agregar(btns, btnEdit);
+        
+        agregar(li, info);
+        agregar(li, btns);
+        agregar(lista, li);
+      }
+    } catch(e) {
+      mensaje("Error al cargar tareas", "error");
+    }
+  }
+  
+  function seleccionarTarea(t) {
+    tareaEditando = t;
+    obtener("editarTextoTarea").value = t.texto;
+    obtener("editarFechaTarea").value = t.fecha || "";
+    obtener("editarPrioridadTarea").value = t.prioridad;
+    obtener("formularioEditar").style.display = "block";
+  }
+  
+  async function guardarTarea() {
+    let texto = obtener("editarTextoTarea").value.trim();
+    let fecha = obtener("editarFechaTarea").value;
+    let prioridad = obtener("editarPrioridadTarea").value;
+    
+    if (!texto) return mensaje("Escribe una tarea", "error");
+    if (texto.length < 3) return mensaje("Mínimo 3 caracteres", "error");
+    
+    try {
+      await servidor("/tareas/" + tareaEditando.id_tarea, "PUT", {
+        texto: texto,
+        fecha: fecha || null,
+        prioridad: prioridad
+      });
+      
+      mensaje("Tarea actualizada", "exito");
+      obtener("formularioEditar").style.display = "none";
+      cargarTareasEditar();
+    } catch(e) {
+      mensaje("Error al actualizar", "error");
+    }
+  }
+  
+  cargarTareasEditar();
+</script>

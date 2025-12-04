@@ -1,8 +1,7 @@
 \# Todo App - Integración Backend
 
 
-
-\## 👨‍💻 Integrantes
+\## Integrantes
 
 \- Mejía Cosíos, Xiomara Andrea
 
@@ -13,8 +12,7 @@
 \- Gavilán Arestegui, Saitd Diraks
 
 
-
-\## ✨ Nueva Funcionalidad
+\## Nueva Funcionalidad
 
 Integración del \*\*backend\*\* con la aplicación de \*\*ToDo App\*\*.  
 
@@ -31,70 +29,94 @@ Se implementaron endpoints para gestionar \*\*usuarios\*\* y \*\*tareas\*\*, inc
 \- Persistencia de datos en archivos \*\*JSON\*\*  
 
 
+## Cómo instalar el aplicativo
 
-\## Cómo instalar aplicativo:
+1. **Asegúrate de tener Python 3 instalado en tu máquina.**  
+   - Entra al **CMD** y ejecuta los siguientes comandos:
+     ```bash
+     python --version
+     py --version
+     ```
+   - Si lo tienes instalado, salta los siguientes pasos.  
+   - Si no, continúa con el procedimiento:  
+     Descarga **Python 3** desde 👉 [https://www.python.org/downloads](https://www.python.org/downloads)  
+   - En **Windows**, al instalar marca la casilla **"Add Python to PATH"** (muy importante).
 
-1\. Asegúrate de tener Python 3 instalado en tu máquina.
+---
 
-2\. Clona el repositorio:  
+2. **Bajar el proyecto al PC.**  
+   - Descarga el **ZIP** desde GitHub haciendo clic en el cuadro verde donde dice **Code** (se descargará `Todo_app-main.zip`).  
+   - Extrae el archivo ZIP.  
+   - Al extraerlo, entra a la carpeta: verás otra carpeta con el mismo nombre.  
+   - Guarda esa carpeta en la ubicación que prefieras.  
+   - Cambia el nombre de la carpeta de `Todo_app-main` a **Todo_app**.
 
-&nbsp;  `git clone https://github.com/nebu10524/Todo\_app.git`
+---
 
-3\. Accede a la carpeta del proyecto:  
+3. **Instala las dependencias necesarias.**  
+   - Abre una terminal en la carpeta del proyecto y ejecuta:
+     ```bash
+     pip install flask flask-cors
+     ```
 
-&nbsp;  `cd Todo\_app`
+---
 
-4\. Instala las dependencias necesarias:  
+4. **Listo — ya está instalado.**
 
-&nbsp;  `pip install flask flask-cors`
+---
 
-5\. Verifica que el entorno esté listo antes de ejecutar el backend.
+## Cómo ejecutar
 
+1. **Arrancar el backend (API).**  
+   - Abre la terminal **CMD** y dirígete a la carpeta:
+     ```bash
+     Todo_app/backend
+     ```
+   - Una vez dentro, ejecuta:
+     ```bash
+     python app.py
+     ```
 
+---
 
-\## Cómo ejecutar:
+2. **Abrir la interfaz (frontend).**  
+   - Ve a la carpeta:
+     ```bash
+     Todo_app/frontend
+     ```
+   - La forma más simple es hacer doble clic en **index.html** para abrirlo en tu navegador.  
+   - También puedes hacer clic derecho → *Abrir con* → y seleccionar el navegador que más te guste.
 
-1\. Backend: `cd backend \&\& python app.py`
+---
 
-2\. Frontend: Abrir `Todolist.html` en navegador
+3. **Después de seguir todos estos pasos podrás usar la app con total normalidad.**
 
-3\. Usar la nueva opción de "Perfil" en la app
+---
 
-
+4. **Detener el backend.**  
+   - En la terminal donde está corriendo el backend, presiona:
+     ```bash
+     Ctrl + C
+     ```
 
 \## Lista de Endpoints implementados:
 
-\### Usuarios
+### Usuarios
+- **POST /usuarios** → Se usa cuando una persona se registra por primera vez en la app para crear su cuenta.  
+- **GET /usuarios** → El sistema muestra la lista de todos los usuarios registrados (normalmente solo lo ve el sistema o el administrador).  
+- **GET /usuarios/{id}** → Sirve para buscar la información de un usuario específico, como su nombre o sus tareas (normalmente solo lo ve el sistema o el administrador).  
+- **PUT /usuarios/{id}** → Se usa cuando el usuario cambia algo en su perfil, por ejemplo, su nombre o contraseña.  
+- **DELETE /usuarios/{id}** → Se usa cuando el usuario decide eliminar su cuenta de la app.  
 
-\- POST /usuarios → Crear un nuevo usuario
+### Tareas
+- **POST /tareas** → Se activa cuando añades una nueva tarea en la lista (“Agregar tarea”).  
+- **GET /tareas** → Sirve para mostrar todas las tareas guardadas cuando entras a la aplicación.  
+- **GET /tareas/{id}** → Se usa cuando quieres ver los detalles de una tarea específica, por ejemplo, para editarla o marcarla como completada.  
+- **PUT /tareas/{id}** → Se activa cuando modificas una tarea existente, como cambiar su texto o marcarla como “hecha”.  
+- **DELETE /tareas/{id}** → Se usa cuando eliminas una tarea individual de tu lista.  
+- **DELETE /tareas/usuario/{usuario_id}** → Sirve cuando se eliminan todas las tareas de un usuario, por ejemplo, si el usuario borra su cuenta o reinicia su lista.  
 
-\- GET /usuarios → Listar todos los usuarios
-
-\- GET /usuarios/{id} → Obtener un usuario específico
-
-\- PUT /usuarios/{id} → Actualizar usuario existente
-
-\- DELETE /usuarios/{id} → Eliminar usuario
-
-
-
-\### Tareas
-
-\- POST /tareas → Crear nueva tarea
-
-\- GET /tareas → Listar todas las tareas (opcional filtrar por usuario\_id)
-
-\- GET /tareas/{id} → Obtener tarea específica
-
-\- PUT /tareas/{id} → Actualizar tarea existente
-
-\- DELETE /tareas/{id} → Eliminar tarea
-
-\- DELETE /tareas/usuario/{usuario\_id} → Eliminar todas las tareas de un usuario
-
-
-
-\## 📂 Estructura de carpetas
+\## Estructura de carpetas
 
 Todo\_app/
 
@@ -110,11 +132,11 @@ Todo\_app/
 
 │── frontend/
 
-│ ├── Todolist.html # Interfaz principal de la aplicación (lista de tareas + login)
+│ ├── index.html # Interfaz principal de la aplicación (lista de tareas + login)
 
 │ ├── styles.css # Estilos de la app
 
-│ └── app.js # Lógica del frontend (manejo de tareas, login simulado)
+│ └── script.js # Lógica del frontend (manejo de tareas, login simulado)
 
 │
 
