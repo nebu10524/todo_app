@@ -1,0 +1,47 @@
+<div class="contenedor">
+  <h1>Mis Tareas</h1>
+  
+  <ul id="listaTareas"></ul>
+</div>
+
+<script>
+  async function cargarTareas() {
+    try {
+      let res = await servidor("/tareas/usuario/" + usuario.id_usuario, "GET");
+      let lista = obtener("listaTareas");
+      lista.innerHTML = "";//borra la lista anterior para remplazar
+      
+      if (!res.tareas || res.tareas.length === 0) {
+        return;
+      }
+      
+      for (let i = 0; i < res.tareas.length; i++) {
+        let t = res.tareas[i];//guarda la tarea en la variable t
+        let li = crear("li");
+        
+        let info = crear("div");
+        info.className = "informacion";
+        
+        let texto = crear("span");
+        texto.textContent = t.texto;//pone el texto de tarea dentro de snap
+        texto.className = "task-text";// agrega dentro de div
+        agregar(info, texto);
+        
+        let fecha = crear("small");
+        fecha.textContent = "Fecha: " + (t.fecha || "Sin fecha");
+        agregar(info, fecha);
+        
+        let prioridad = crear("small");
+        prioridad.textContent = "Prioridad: " + t.prioridad;
+        agregar(info, prioridad);
+        
+        agregar(li, info);
+        agregar(lista, li);
+      }
+    } catch(e) {
+      mensaje("Error al cargar tareas", "error");
+    }
+  }
+
+  cargarTareas();
+</script>

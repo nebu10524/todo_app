@@ -1,263 +1,303 @@
-from flask import Flask, request, jsonify
-from flask_cors import CORS
-import json
+from flask import Flask, request, jsonify, send_from_directory  #Trae las herramientas básicas para que Flask funcione como servidor.
+from flask_cors import CORS #permite comunicación entre frontend y backend
+import mysql.connector#conecta Python con MySQL
 import os
 
-app = Flask(__name__)
-CORS(app)
+# ===== CONFIGURACIÓN PARA SERVIR FRONTEND =====
+# Obtener la ruta absoluta de la carpeta frontend
+BASE_DIR = os.path.dirname(os.path.abspath(__file__)) # Obtiene la ruta donde está app.py
+FRONTEND_DIR = os.path.join(os.path.dirname(BASE_DIR), 'frontend') # Construye la ruta a la carpeta frontend
 
-# === ARCHIVOS JSON ===
-USUARIOS_FILE = "usuarios.json"
-TAREAS_FILE = "tareas.json"
+app = Flask(__name__, static_folder=FRONTEND_DIR, static_url_path='') #Crea el servidor web y le dice dónde están los archivos HTML/CSS/JS
+CORS(app) #Permite que tu página web (frontend) pueda hablar con tu servidor (backend)
 
-# === FUNCIONES DE AYUDA PARA JSON ===
-def leer_json(archivo):
-    if os.path.exists(archivo):
-        with open(archivo, "r", encoding="utf-8") as f:
-            return json.load(f)
-    return {}
+# =======================================================
+# === CONEXIÓN A MySQL ===
+# =======================================================
+conexion = mysql.connector.connect(
+    host="localhost",
+    user="root",
+    password="",
+    database="todo_app"
+)
 
-def guardar_json(archivo, datos):
-    with open(archivo, "w", encoding="utf-8") as f:
-        json.dump(datos, f, indent=4, ensure_ascii=False)
+# =======================================================
+# === FUNCIÓN AUXILIAR PARA FORMATEAR FECHAS ===
+# =======================================================
+def formatear_fecha(fecha):
+    if fecha is None:
+        return None
+    return fecha.strftime("%Y-%m-%d")
 
-# === INICIALIZAR "BASE DE DATOS" ===
-usuarios = leer_json(USUARIOS_FILE)
-tareas = leer_json(TAREAS_FILE)
-contador_tareas = len(tareas) + 1
-
-# === ENDPOINT PRINCIPAL ===
+# =======================================================
+# === SERVIR ARCHIVOS DEL FRONTEND ===
+# =======================================================
 @app.route("/")
 def home():
-    return jsonify({"mensaje": "🚀 API de ToDo funcionando con CRUD de Usuarios y Tareas con JSON"})
+    return send_from_directory(FRONTEND_DIR, 'index.html')
 
-# ========================================
+# =======================================================
 # === CRUD DE USUARIOS ===
-# ========================================
+# =======================================================
 
-# CREATE
 @app.route("/usuarios", methods=["POST"])
 def crear_usuario():
-    global usuarios
-    datos = request.get_json()
-
-    if not datos or "usuario" not in datos or "email" not in datos or "password" not in datos:
+    data = request.get_json()
+    if not data or "usuario" not in data or "email" not in data or "password" not in data:
         return jsonify({"success": False, "message": "Faltan datos"}), 400
 
-    nuevo_id = f"U{len(usuarios)+1:03d}"
-    usuario = {
-        "id": nuevo_id,
-        "usuario": datos["usuario"],
-        "email": datos["email"],
-        "password": datos["password"]
-    }
+    cursor = conexion.cursor()
+    cursor.execute("SELECT id_usuario FROM usuarios ORDER BY id_usuario DESC LIMIT 1")
+    ultimo = cursor.fetchone()
+    
+    if ultimo:
+        numero = int(ultimo[0][3:]) + 1
+        id_usuario = f"USU{numero:03d}"
+    else:
+        id_usuario = "USU001"
 
-    usuarios[nuevo_id] = usuario
-    guardar_json(USUARIOS_FILE, usuarios)
+    sql = "INSERT INTO usuarios (id_usuario, usuario, email, password) VALUES (%s, %s, %s, %s)" 
+    cursor.execute(sql, (id_usuario, data["usuario"], data["email"], data["password"]))
+    conexion.commit()
+    cursor.close()
 
     return jsonify({
         "success": True,
         "message": "Usuario creado exitosamente",
-        "usuario": usuario
+        "usuario": {
+            "id_usuario": id_usuario,
+            "usuario": data["usuario"],
+            "email": data["email"]
+        }
     }), 201
 
-# READ (todos los usuarios)
+
 @app.route("/usuarios", methods=["GET"])
 def listar_usuarios():
-    return jsonify({"success": True, "usuarios": list(usuarios.values())}), 200
+    cursor = conexion.cursor(dictionary=True)
+    cursor.execute("SELECT id_usuario, usuario, email FROM usuarios")
+    usuarios = cursor.fetchall()
+    cursor.close()
+    return jsonify({"success": True, "usuarios": usuarios}), 200
 
-# READ (un usuario específico)
+
 @app.route("/usuarios/<id>", methods=["GET"])
 def obtener_usuario(id):
-    if id not in usuarios:
+    cursor = conexion.cursor(dictionary=True)
+    cursor.execute("SELECT id_usuario, usuario, email FROM usuarios WHERE id_usuario = %s", (id,))
+    usuario = cursor.fetchone()
+    cursor.close()
+    if not usuario:
         return jsonify({"success": False, "message": "Usuario no encontrado"}), 404
-    return jsonify({"success": True, "usuario": usuarios[id]}), 200
+    return jsonify({"success": True, "usuario": usuario}), 200
 
-# UPDATE
+
 @app.route("/usuarios/<id>", methods=["PUT"])
 def actualizar_usuario(id):
-    global usuarios
-    if id not in usuarios:
+    data = request.get_json()
+    cursor = conexion.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM usuarios WHERE id_usuario = %s", (id,))
+    usuario = cursor.fetchone()
+
+    if not usuario:
+        cursor.close()
         return jsonify({"success": False, "message": "Usuario no encontrado"}), 404
 
-    datos = request.get_json()
-    if not datos:
-        return jsonify({"success": False, "message": "No enviaste datos"}), 400
+    usuario["usuario"] = data.get("usuario", usuario["usuario"])
+    usuario["email"] = data.get("email", usuario["email"])
+    usuario["password"] = data.get("password", usuario["password"])
 
-    usuario = usuarios[id]
-    if "usuario" in datos:
-        usuario["usuario"] = datos["usuario"]
-    if "email" in datos:
-        usuario["email"] = datos["email"]
-    if "password" in datos:
-        usuario["password"] = datos["password"]
-
-    usuarios[id] = usuario
-    guardar_json(USUARIOS_FILE, usuarios)
+    sql = "UPDATE usuarios SET usuario=%s, email=%s, password=%s WHERE id_usuario=%s"
+    cursor.execute(sql, (usuario["usuario"], usuario["email"], usuario["password"], id))
+    conexion.commit()
+    cursor.close()
 
     return jsonify({
-        "success": True,
+        "success": True, 
         "message": "Usuario actualizado correctamente",
-        "usuario": usuario
+        "usuario": {
+            "id_usuario": id,
+            "usuario": usuario["usuario"],
+            "email": usuario["email"],
+            "password": usuario["password"]
+        }
     }), 200
 
-# DELETE
+
 @app.route("/usuarios/<id>", methods=["DELETE"])
 def eliminar_usuario(id):
-    global usuarios
-    if id not in usuarios:
-        return jsonify({"success": False, "message": "Usuario no encontrado"}), 404
+    cursor = conexion.cursor()
+    cursor.execute("DELETE FROM usuarios WHERE id_usuario = %s", (id,))
+    conexion.commit()
+    cursor.close()
+    return jsonify({"success": True, "message": "Usuario eliminado correctamente"}), 200
 
-    eliminado = usuarios.pop(id)
-    guardar_json(USUARIOS_FILE, usuarios)
 
-    return jsonify({
-        "success": True,
-        "message": "Usuario eliminado correctamente",
-        "usuario": eliminado
-    }), 200
-
-# LOGIN
 @app.route("/login", methods=["POST"])
 def login():
-    datos = request.get_json()
-    if not datos or "email" not in datos or "password" not in datos:
+    data = request.get_json()
+    if not data or "email" not in data or "password" not in data:
         return jsonify({"success": False, "message": "Faltan credenciales"}), 400
 
-    for u in usuarios.values():
-        if u["email"] == datos["email"] and u["password"] == datos["password"]:
-            return jsonify({"success": True, "message": "Login exitoso", "usuario": u}), 200
+    cursor = conexion.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM usuarios WHERE email = %s AND password = %s", (data["email"], data["password"]))
+    usuario = cursor.fetchone()
+    cursor.close()
 
-    return jsonify({"success": False, "message": "Credenciales incorrectas"}), 401
+    if usuario:
+        return jsonify({"success": True, "message": "Login exitoso", "usuario": usuario}), 200
+    else:
+        return jsonify({"success": False, "message": "Credenciales incorrectas"}), 401
 
-# ========================================
+
+# =======================================================
 # === CRUD DE TAREAS ===
-# ========================================
+# =======================================================
 
-# CREATE - Crear nueva tarea
-@app.route('/tareas', methods=['POST'])
+@app.route("/tareas", methods=["POST"])
 def crear_tarea():
-    global tareas, contador_tareas
-    datos = request.get_json()
-    
-    if not datos or "usuario_id" not in datos or "texto" not in datos:
-        return jsonify({"success": False, "message": "Faltan datos (usuario_id y texto son requeridos)"}), 400
-    
-    if datos["usuario_id"] not in usuarios:
-        return jsonify({"success": False, "message": "Usuario no encontrado"}), 404
-    
-    id_tarea = f"T{contador_tareas:03d}"
-    contador_tareas += 1
-    
-    tarea = {
-        "id": id_tarea,
-        "usuario_id": datos["usuario_id"],
-        "texto": datos["texto"],
-        "fecha": datos.get("fecha"),
-        "prioridad": datos.get("prioridad", "media"),
-        "completada": datos.get("completada", False)
-    }
-    
-    tareas[id_tarea] = tarea
-    guardar_json(TAREAS_FILE, tareas)
-    
-    return jsonify({
-        "success": True, 
-        "message": "Tarea creada exitosamente", 
-        "tarea": tarea
-    }), 201
+    data = request.get_json()
+    if not data or "usuario_id" not in data or "texto" not in data:
+        return jsonify({"success": False, "message": "Faltan datos (usuario_id, texto)"}), 400
 
-# READ - Obtener todas las tareas
-@app.route('/tareas', methods=['GET'])
-def obtener_todas_tareas():
-    usuario_id = request.args.get('usuario_id')
-    
-    if usuario_id:
-        tareas_filtradas = [t for t in tareas.values() if t["usuario_id"] == usuario_id]
-        return jsonify({"success": True, "tareas": tareas_filtradas}), 200
-    
-    return jsonify({"success": True, "tareas": list(tareas.values())}), 200
+    cursor = conexion.cursor()
 
-# READ - Obtener una tarea específica
-@app.route('/tareas/<id>', methods=['GET'])
-def obtener_tarea(id):
-    if id not in tareas:
-        return jsonify({"success": False, "message": "Tarea no encontrada"}), 404
-    return jsonify({"success": True, "tarea": tareas[id]}), 200
+    cursor.execute("SELECT id_tarea FROM tareas ORDER BY id_tarea DESC LIMIT 1")
+    ultimo = cursor.fetchone()
 
-# UPDATE - Actualizar tarea existente
-@app.route('/tareas/<id>', methods=['PUT'])
-def actualizar_tarea(id):
-    global tareas
-    if id not in tareas:
-        return jsonify({"success": False, "message": "Tarea no encontrada"}), 404
-    
-    datos = request.get_json()
-    if not datos:
-        return jsonify({"success": False, "message": "Debe enviar datos para actualizar"}), 400
-    
-    tarea = tareas[id]
-    
-    if "texto" in datos:
-        tarea["texto"] = datos["texto"]
-    if "fecha" in datos:
-        tarea["fecha"] = datos["fecha"]
-    if "prioridad" in datos:
-        tarea["prioridad"] = datos["prioridad"]
-    if "completada" in datos:
-        tarea["completada"] = datos["completada"]
-    
-    tareas[id] = tarea
-    guardar_json(TAREAS_FILE, tareas)
-    
-    return jsonify({
-        "success": True, 
-        "message": "Tarea actualizada correctamente", 
-        "tarea": tarea
-    }), 200
+    if ultimo:
+        numero = int(ultimo[0][3:]) + 1
+        id_tarea = f"TAR{numero:03d}"
+    else:
+        id_tarea = "TAR001"
 
-# DELETE - Eliminar tarea
-@app.route('/tareas/<id>', methods=['DELETE'])
-def eliminar_tarea(id):
-    global tareas
-    if id not in tareas:
-        return jsonify({"success": False, "message": "Tarea no encontrada"}), 404
-    
-    eliminada = tareas.pop(id)
-    guardar_json(TAREAS_FILE, tareas)
-    
-    return jsonify({
-        "success": True, 
-        "message": "Tarea eliminada correctamente",
-        "tarea": eliminada
-    }), 200
+    sql = """
+        INSERT INTO tareas (id_tarea, usuario_id, texto, fecha, prioridad, completada)
+        VALUES (%s, %s, %s, %s, %s, %s)
+    """
+    cursor.execute(sql, (
+        id_tarea,
+        data["usuario_id"],
+        data["texto"],
+        data.get("fecha"),
+        data.get("prioridad", "media"),
+        bool(data.get("completada", False))
+    ))
+    conexion.commit()
+    cursor.close()
 
-# DELETE - Eliminar todas las tareas de un usuario
-@app.route('/tareas/usuario/<usuario_id>', methods=['DELETE'])
-def eliminar_tareas_usuario(usuario_id):
-    global tareas
-    if usuario_id not in usuarios:
-        return jsonify({"success": False, "message": "Usuario no encontrado"}), 404
-    
-    tareas_eliminadas = []
-    ids_a_eliminar = []
-    
-    for id_tarea, tarea in tareas.items():
-        if tarea["usuario_id"] == usuario_id:
-            tareas_eliminadas.append(tarea)
-            ids_a_eliminar.append(id_tarea)
-    
-    for id_tarea in ids_a_eliminar:
-        del tareas[id_tarea]
-    
-    guardar_json(TAREAS_FILE, tareas)
-    
     return jsonify({
         "success": True,
-        "message": f"Se eliminaron {len(tareas_eliminadas)} tareas del usuario",
-        "tareas_eliminadas": tareas_eliminadas
+        "message": "Tarea creada exitosamente",
+        "id_tarea": id_tarea
+    }), 201
+
+
+@app.route("/tareas", methods=["GET"])
+def obtener_tareas():
+    cursor = conexion.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM tareas")
+    tareas = cursor.fetchall()
+    cursor.close()
+
+    for t in tareas:
+        t["completada"] = bool(t["completada"])
+        t["fecha"] = formatear_fecha(t["fecha"])
+
+    return jsonify({"success": True, "tareas": tareas}), 200
+
+
+@app.route("/tareas/<id>", methods=["GET"])
+def obtener_tarea(id):
+    cursor = conexion.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM tareas WHERE id_tarea = %s", (id,))
+    tarea = cursor.fetchone()
+    cursor.close()
+
+    if not tarea:
+        return jsonify({"success": False, "message": "Tarea no encontrada"}), 404
+
+    tarea["completada"] = bool(tarea["completada"])
+    tarea["fecha"] = formatear_fecha(tarea["fecha"])
+
+    return jsonify({"success": True, "tarea": tarea}), 200
+
+
+@app.route("/tareas/usuario/<usuario_id>", methods=["GET"])
+def obtener_tareas_por_usuario(usuario_id):
+    cursor = conexion.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM tareas WHERE usuario_id = %s", (usuario_id,))
+    tareas = cursor.fetchall()
+    cursor.close()
+
+    for t in tareas:
+        t["completada"] = bool(t["completada"])
+        t["fecha"] = formatear_fecha(t["fecha"])
+
+    return jsonify({"success": True, "tareas": tareas}), 200
+
+
+@app.route("/tareas/<id>", methods=["PUT"])
+def actualizar_tarea(id):
+    data = request.get_json()
+    if not data:
+        return jsonify({"success": False, "message": "Debe enviar datos para actualizar"}), 400
+
+    campos = []
+    valores = []
+
+    if "texto" in data:
+        campos.append("texto = %s")
+        valores.append(data["texto"])
+    if "fecha" in data:
+        campos.append("fecha = %s")
+        valores.append(data["fecha"])
+    if "prioridad" in data:
+        campos.append("prioridad = %s")
+        valores.append(data["prioridad"])
+    if "completada" in data:
+        campos.append("completada = %s")
+        valores.append(bool(data["completada"]))
+
+    if not campos:
+        return jsonify({"success": False, "message": "No hay campos válidos para actualizar"}), 400
+
+    valores.append(id)
+    sql = f"UPDATE tareas SET {', '.join(campos)} WHERE id_tarea = %s"
+
+    cursor = conexion.cursor()
+    cursor.execute(sql, valores)
+    conexion.commit()
+    cursor.close()
+
+    return jsonify({"success": True, "message": "Tarea actualizada correctamente"}), 200
+
+
+@app.route("/tareas/<id>", methods=["DELETE"])
+def eliminar_tarea(id):
+    cursor = conexion.cursor()
+    cursor.execute("DELETE FROM tareas WHERE id_tarea = %s", (id,))
+    conexion.commit()
+    cursor.close()
+    return jsonify({"success": True, "message": "Tarea eliminada correctamente"}), 200
+
+
+@app.route("/tareas/usuario/<usuario_id>", methods=["DELETE"])
+def eliminar_tareas_usuario(usuario_id):
+    cursor = conexion.cursor()
+    cursor.execute("DELETE FROM tareas WHERE usuario_id = %s", (usuario_id,))
+    conexion.commit()
+    cursor.close()
+    return jsonify({
+        "success": True,
+        "message": f"Tareas del usuario {usuario_id} eliminadas correctamente"
     }), 200
 
+
+# =======================================================
 # === EJECUTAR SERVIDOR ===
-if __name__ == '__main__':
+# =======================================================
+if __name__ == "__main__":
+    print(f"Frontend folder: {FRONTEND_DIR}")
+    print(f"Servidor corriendo en http://localhost:5000")
     app.run(debug=True, host="0.0.0.0", port=5000)

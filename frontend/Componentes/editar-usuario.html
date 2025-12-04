@@ -1,0 +1,57 @@
+<section class="contenedor">
+  <h1>Editar Mi Perfil</h1>
+
+  <div class="info-actual">
+    <p><strong>Usuario actual:</strong> <span id="infoUsuario"></span></p>
+    <p><strong>Email actual:</strong> <span id="infoEmail"></span></p>
+  </div>
+
+  <div class="auth-form">
+    <input type="text" id="editarUsuario" placeholder="Nuevo nombre de usuario"/>
+    <input type="email" id="editarEmail" placeholder="Nuevo email"/>
+    <input type="password" id="editarPassword" placeholder="Nueva contraseña"/>
+    <small style="color:#666;">Llena solo los campos que quieras cambiar</small>
+    <div class="auth-buttons">
+      <button onclick="editarPerfil()" class="btn-success">Guardar Cambios</button>
+    </div>
+  </div>
+</section>
+
+<script>
+  obtener("infoUsuario").textContent = usuario.usuario;
+  obtener("infoEmail").textContent = usuario.email;
+  
+  async function editarPerfil() {
+    let user = obtener("editarUsuario").value.trim();
+    let email = obtener("editarEmail").value.trim();
+    let pass = obtener("editarPassword").value.trim();
+    
+    if (!user && !email && !pass)
+      return mensaje("Ingresa al menos un campo", "advertencia");
+    if (user && user.length < 3)
+      return mensaje("Usuario: mínimo 3 caracteres", "error");
+    if (pass && pass.length < 6)
+      return mensaje("Contraseña: mínimo 6 caracteres", "error");
+    
+    try {
+      let datos = {};//guarda datos que se van a actualizar
+      if (user) datos.usuario = user;// si escribe algo se guarda y caso contrario no
+      if (email) datos.email = email;
+      if (pass) datos.password = pass;
+      
+      await servidor("/usuarios/" + usuario.id_usuario, "PUT", datos);
+      
+      if (user) usuario.usuario = user;//si se actializo q guarda en la sesion tambien
+      if (email) usuario.email = email;
+      if (pass) usuario.password = pass;
+      guardarSesion("usuario", usuario);
+      
+      obtener("infoUsuario").textContent = usuario.usuario;
+      obtener("infoEmail").textContent = usuario.email;
+      
+      mensaje("Perfil actualizado", "exito");
+    } catch(e) {
+      mensaje("Error al actualizar", "error");
+    }
+  }
+</script>

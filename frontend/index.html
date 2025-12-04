@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TODO_LIST</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .modules {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      max-width: 1000px;
+      margin: 0 auto 20px;
+      padding: 0 20px;
+    }
+    .module-btn {
+      padding: 15px;
+      background: #fff;
+      border: 2px solid #ccc;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 14px;
+      color: #000;
+    }
+    #contenido {
+      max-width: 1000px;
+      margin: 0 auto;
+      background: white;
+      padding: 30px;
+      border: 2px solid #ccc;
+      min-height: 500px;
+    }
+  </style>
+</head>
+<body>
+  
+  <h1 style="text-align:center; font-size:2.5em; margin:30px 0;">TODO_LIST</h1>
+
+  <div class="modules">
+    <button class="module-btn" onclick="cargarModulo('login')">Login</button>
+    <button class="module-btn" onclick="cargarModulo('registro')">Registro</button>
+    <button class="module-btn" onclick="cargarModulo('agregar-tarea')">Agregar Tareas</button>
+    <button class="module-btn" onclick="cargarModulo('ver-tareas')">Ver Tareas</button>
+    <button class="module-btn" onclick="cargarModulo('lista-usuarios')">Lista de Usuarios</button>
+    <button class="module-btn" onclick="cargarModulo('exportar')">Exportar</button>
+    <button class="module-btn" onclick="cargarModulo('editar-tarea')">Editar Tarea</button>
+    <button class="module-btn" onclick="cargarModulo('eliminar-tarea')">Eliminar Tarea</button>
+    <button class="module-btn" onclick="cargarModulo('eliminar-todas-tareas')">Eliminar Todas</button>
+    <button class="module-btn" onclick="cargarModulo('editar-usuario')">Editar Usuario</button>
+    <button class="module-btn" onclick="cargarModulo('eliminar-usuario')">Eliminar Usuario</button>
+    <button class="module-btn" onclick="cargarModulo('cerrar-sesion')">Cerrar Sesión</button>
+  </div>
+
+  <div id="contenido"></div>
+
+  <script src="Java/utilidades.js"></script>
+  <script src="Java/config.js"></script>
+  <script>
+    async function cargarModulo(nombre) {
+      let ruta = 'Componentes/' + nombre + '.html'; //construye la ruta del archivo
+      let respuesta = await fetch(ruta);          //Busca y descarga el archivo
+      let html = await respuesta.text();          //Convierte archivo en texto
+      obtener('contenido').innerHTML = html;
+      activarScripts();
+    }
+    
+    function activarScripts() {
+      let contenido = obtener('contenido');
+      let scripts = contenido.getElementsByTagName('script');// busca todos los scripts 
+      
+      for (let i = 0; i < scripts.length; i++) { //Recorre cada script encontrado
+        let nuevo = crear('script');// crea nuevo elemento 
+        nuevo.textContent = scripts[i].textContent;// Copia el código del script original al nuevo
+        scripts[i].parentNode.replaceChild(nuevo, scripts[i]);//Remplaza el script viejo por el nuevo
+      }
+    }
+  </script>
+</body>
+</html>

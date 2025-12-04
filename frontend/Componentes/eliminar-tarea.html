@@ -1,0 +1,76 @@
+<div class="contenedor">
+  <h1>Eliminar Tarea</h1>
+  
+  <div class="info-actual">
+    <p>Selecciona una tarea para eliminar</p>
+  </div>
+  
+  <ul id="listaTareas"></ul>
+</div>
+
+<script>
+  async function eliminar(id) {
+    if (!confirm("¿Eliminar?")) return;
+    
+    try {
+      await servidor("/tareas/" + id, "DELETE");
+      await cargarTareas();
+      mensaje("Eliminada", "exito");
+    } catch(e) {
+      mensaje("Error", "error");
+    }
+  }
+  
+  async function cargarTareas() {
+    try {
+      let res = await servidor("/tareas/usuario/" + usuario.id_usuario, "GET");
+      let lista = obtener("listaTareas");
+      lista.innerHTML = "";
+      
+      if (!res.tareas || res.tareas.length === 0) {
+        lista.innerHTML = "<li>No hay tareas</li>";
+        return;
+      }
+      
+      for (let i = 0; i < res.tareas.length; i++) {
+        mostrarTarea(res.tareas[i]);
+      }
+    } catch(e) {
+      mensaje("Error al cargar tareas", "error");
+    }
+  }
+  
+  function mostrarTarea(t) {
+    let li = crear("li");
+    if (t.completada) li.className = "completada";
+    
+    let info = crear("div");
+    info.className = "informacion";
+    
+    let texto = crear("span");
+    texto.textContent = t.texto;
+    texto.className = "task-text";
+    agregar(info, texto);
+    
+    let fecha = crear("small");
+    fecha.textContent = t.fecha ? "Límite: " + t.fecha : "Sin fecha";
+    agregar(info, fecha);
+    
+    let btns = crear("div");
+    btns.className = "task-buttons";
+    
+    let btnDel = crear("button");
+    btnDel.className = "eliminar";
+    btnDel.textContent = "Eliminar";
+    btnDel.onclick = (function(id) {
+      return function() { eliminar(id); };
+    })(t.id_tarea);
+    agregar(btns, btnDel);
+    
+    agregar(li, info);
+    agregar(li, btns);
+    agregar(obtener("listaTareas"), li);
+  }
+  
+  cargarTareas();
+</script>

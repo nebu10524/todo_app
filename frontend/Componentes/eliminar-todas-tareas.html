@@ -1,0 +1,25 @@
+<div class="contenedor">
+  <h1>Eliminar Todas las Tareas</h1>
+  
+  <div class="info-actual">
+    <p style="text-align:center; color:#dc3545; font-weight:bold;">⚠️ Esta acción eliminará TODAS tus tareas</p>
+    <p style="text-align:center;">Esta acción no se puede deshacer</p>
+  </div>
+  
+  <div class="action-buttons">
+    <button onclick="eliminarTodas()" style="background:#dc3545; color:white;">Eliminar todas</button>
+  </div>
+</div>
+
+<script>
+  async function eliminarTodas() {
+    if (!confirm("¿Borrar TODAS?")) return;
+    
+    try {
+      await servidor("/tareas/usuario/" + usuario.id_usuario, "DELETE");
+      mensaje("Todas eliminadas", "exito");
+    } catch(e) {
+      mensaje("Error", "error");
+    }
+  }
+</script>
